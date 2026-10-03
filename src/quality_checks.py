@@ -63,6 +63,11 @@ CHECKS = {
         WHERE w.reading_time IS NULL
         GROUP BY i.plant_id
     """,
+    "6. Reading status counts": """
+        SELECT plant_id, status, COUNT(*) AS readings
+        FROM readings
+        GROUP BY plant_id, status
+    """,
 }
 
 

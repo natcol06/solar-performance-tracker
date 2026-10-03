@@ -13,12 +13,23 @@ def parse_times(col):
     fmt = "%Y-%m-%d %H:%M:%S" if year_first else "%d-%m-%Y %H:%M"
     return pd.to_datetime(col, format=fmt).dt.strftime("%Y-%m-%d %H:%M:%S")
 
+# Fixing discrepancies in data formatting.
+def fix_dc_scale(gen):
+    """Fix DC power logged 10 times too big (found by quality check 2)."""
+    daytime = gen[gen["DC_POWER"] > 0]
+    ratio = (daytime["AC_POWER"] / daytime["DC_POWER"]).median()
+    if ratio < 0.5:
+        print(f"AC/DC ratio is {ratio:.3f}, so dividing DC_POWER by 10")
+        gen["DC_POWER"] = gen["DC_POWER"] / 10
+    return gen
+
 # Reads a plant's CSVs, renames columns to match the schema,
 # remove repeated rows, and write them into the database.
 def load_plant(conn, number):
     gen = pd.read_csv(RAW / f"Plant_{number}_Generation_Data.csv")
     weather = pd.read_csv(RAW / f"Plant_{number}_Weather_Sensor_Data.csv")
     plant_id = int(gen["PLANT_ID"].iloc[0])
+    gen = fix_dc_scale(gen)
 
     gen["reading_time"] = parse_times(gen["DATE_TIME"])
     weather["reading_time"] = parse_times(weather["DATE_TIME"])
