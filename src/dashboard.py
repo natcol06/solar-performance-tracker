@@ -48,7 +48,7 @@ daily = query(
     """,
     (plant,),
 )
-st.line_chart(daily, x="day", y=["actual_kwh", "expected_kwh"])
+st.line_chart(daily, x="day", y=["actual_kwh", "expected_kwh"], color=["#4da6ff", "#ffa64d"])
 
 st.subheader("Performance ratio by inverter")
 st.bar_chart(summary, x="inverter_id", y="performance_ratio")
@@ -79,4 +79,4 @@ detail = query(
     """,
     (inverter, day),
 )
-st.line_chart(detail, x="reading_time", y=["actual_kw", "expected_kw"])
+st.line_chart(detail, x="reading_time", y=["actual_kw", "expected_kw"], color=["#4da6ff", "#ffa64d"])
